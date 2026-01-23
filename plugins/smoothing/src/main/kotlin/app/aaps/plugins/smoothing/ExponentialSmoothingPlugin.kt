@@ -84,12 +84,12 @@ class ExponentialSmoothingPlugin @Inject constructor(
 
         if (windowSize >= 4) { //MP: Require a valid windowSize of at least 4 readings
             o1_sBG.add(data[windowSize - 1].value) //MP: Initialise smoothing with the oldest valid data point
-            aapsLogger.debug(LTag.GLUCOSE, "data[windowSize - 1].value: " + " o1_sBG[0]: " + o1_sBG[0])
+            aapsLogger.debug(LTag.GLUCOSE, "data[windowSize - 1].value: ${o1_sBG[0]}")
             for (i in 0 until windowSize) { //MP calculate smoothed bg window of valid readings
                 o1_sBG.add(
                     0,
                     o1_sBG[0] + o1_a * (data[windowSize - 1 - i].value - o1_sBG[0])
-                    aapsLogger.debug(LTag.GLUCOSE, "i: " + i + " data[windowSize - 1 - i].value: " + " o1_sBG[0]: " + o1_sBG[0])
+                    //aapsLogger.debug(LTag.GLUCOSE, "i: " + i + " data[windowSize - 1 - i].value: " + " o1_sBG[0]: " + o1_sBG[0])
                 ) //MP build array of 1st order smoothed bgs
             }
         } else {
@@ -122,7 +122,7 @@ class ExponentialSmoothingPlugin @Inject constructor(
             for (i in o2_sBG.indices) { //MP calculated doubly smoothed bg of all o1/o2 smoothed data available; o2 & o1 smooth bg array sizes are equal in size, so only one is used as a condition
                 // here
                 ssBG.add(o1_weight * o1_sBG[i] + (1 - o1_weight) * o2_sBG[i]) //MP build array of doubly smoothed bgs
-                aapsLogger.debug(LTag.GLUCOSE, "i: " + i + " o1_sBG: " + o1_sBG[i] + " o2_sBG: " + o2_sBG[i])
+                //aapsLogger.debug(LTag.GLUCOSE, "i: " + i + " o1_sBG: " + o1_sBG[i] + " o2_sBG: " + o2_sBG[i])
             }
             for (i in 0 until minOf(ssBG.size, data.size)) { // noise at the beginning of the smoothing window is the greatest, so only include the 10 most recent values in the output
                 data[i].smoothed = max(round(ssBG[i]), 39.0) //Make 39 the smallest value as smaller values trigger errors (xDrip error state = 38)
